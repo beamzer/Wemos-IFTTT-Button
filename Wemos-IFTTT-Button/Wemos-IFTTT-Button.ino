@@ -21,9 +21,7 @@
 
 #define TRIGGER_PIN D3            // Wemos ButtonShield is connected to D3
 
-const char* host        = "maker.ifttt.com";          // maker channel of IFTTT
-const char* trigger     = "button";
-const char* triggerKey  = "**********************";  // Fill this with your IFTTT Maker key
+
   
 boolean val             = true;                      // to hold LED state
 long longPressTime      = 250;
@@ -34,8 +32,44 @@ void setup() {                                       // Setup Stuff, this is run
   pinMode(TRIGGER_PIN, INPUT);                       // so we can read the switch
   pinMode(BUILTIN_LED, OUTPUT);                      // set onboard LED as output
   digitalWrite(BUILTIN_LED, HIGH);                   // turn LED off
-  }
+  } //setup
 
+void ifttt() {
+  const char host[ ]        = "maker.ifttt.com";          // maker channel of IFTTT
+  const char trigger[ ]     = "button";
+  const char APIKey[ ]      = "**********************";
+
+  Serial.print("Connect to: ");
+  Serial.println(host);
+
+  // WiFiClient to make HTTP connection
+  WiFiClient client;
+  if (!client.connect(host, 80)) {
+    Serial.println("connection failed");
+    return;
+    }
+
+  // Build URL
+  String url = String("/trigger/") + trigger + String("/with/key/") + APIKey;
+
+  Serial.print("Requesting URL: ");
+  Serial.println(url);
+
+  // Send request to IFTTT
+  client.print(String("GET ") + url + " HTTP/1.1\r\n" + "Host: " + host + "\r\n" + "Connection: close\r\n\r\n");
+  delay(20);
+
+  // Read all the lines of the reply from server and print them to Serial
+  Serial.println("Respond:");
+  while(client.available()){
+    String line = client.readStringUntil('\r');
+    Serial.print(line);
+    }
+
+  Serial.println();
+  Serial.println("closing connection");
+  } //ifttt
+  
 void longpress() {          // long button press
 
     flash(3);               // signal that we're going into AP mode to receive WiFi configuration
@@ -83,9 +117,15 @@ void flash(int y) {                 // flash LED y times
   } //flash
   
 void shortpress() {                 // short button press
-  Serial.println("Click");
-  val = !val;
-  digitalWrite(BUILTIN_LED, val);   // sets the LED to the button's value
+
+//  Serial.println("Click");
+//  val = !val;
+//  digitalWrite(BUILTIN_LED, val);   // toggle's the LED
+
+  digitalWrite(BUILTIN_LED, LOW);     // LED on
+  ifttt();
+  digitalWrite(BUILTIN_LED, HIGH);    // LED off
+  
   } //shortpress
 
 void loop() {                                         // program loop, do untill doomsday 
