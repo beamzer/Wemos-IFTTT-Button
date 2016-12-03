@@ -15,6 +15,11 @@ This board is more or less the same as the NodeMCU boards, Adafruit Huzzah, etc.
 - Compatible with nodemcu
 
 ## Wemos IFTTT Button
+I use the [Wemos D1 mini 1-button shield](https://www.wemos.cc/product/1-button-shield.html) just out of
+convenience, but you can just as easy solder a switch of your on to the D3 input of the D1 mini (or any
+other GPIO if you modify the code accordingly). The device can differentiate between long and short button
+presses.
+
 short press will connect to IFTTT and perform any action you configured there
 examples are:
 - send a push message to your smartphone
